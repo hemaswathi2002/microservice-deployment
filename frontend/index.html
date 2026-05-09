@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo App</title>
+    <style>
+        :root {
+            --bg:       #0d1117;
+            --surface:  #161b22;
+            --border:   #30363d;
+            --accent:   #2f81f7;
+            --accent2:  #7c3aed;
+            --green:    #3fb950;
+            --red:      #f85149;
+            --yellow:   #d29922;
+            --text:     #e6edf3;
+            --muted:    #8b949e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+               background: var(--bg); color: var(--text); min-height: 100vh; }
+
+        /* ── Header ── */
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            height: 56px;
+            gap: 1rem;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 14px; color: white; flex-shrink: 0;
+        }
+        header h1 { font-size: 1rem; font-weight: 600; }
+        .header-right { margin-left: auto; display: flex; align-items: center; gap: 1rem; }
+        .badge-green { background: #0f2a1a; color: var(--green);
+            border: 1px solid #1a4a2a; padding: 3px 10px;
+            border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+
+        /* ── Nav ── */
+        nav {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            display: flex; gap: 0;
+        }
+        .nav-btn {
+            padding: 0.8rem 1.2rem;
+            background: none; border: none;
+            color: var(--muted); cursor: pointer;
+            font-size: 0.875rem;
+            border-bottom: 2px solid transparent;
+            transition: all 0.15s;
+        }
+        .nav-btn:hover { color: var(--text); }
+        .nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+        /* ── Layout ── */
+        main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+        .tab { display: none; }
+        .tab.active { display: block; }
+
+        /* ── Stats Row ── */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px; padding: 1.2rem;
+        }
+        .stat-num { font-size: 1.8rem; font-weight: 700; }
+        .stat-label { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
+
+        /* ── Card ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600; font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        /* ── Form ── */
+        .form-body { padding: 1.5rem; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+        .field label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
+        input, select {
+            width: 100%; padding: 0.5rem 0.75rem;
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 6px; color: var(--text); font-size: 0.875rem;
+        }
+        input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(47,129,247,0.2); }
+
+        /* ── Buttons ── */
+        .btn { padding: 0.5rem 1rem; border: none; border-radius: 6px;
+               cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: all 0.15s; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #1a6edb; }
+        .btn-sm { padding: 3px 10px; font-size: 0.75rem; }
+        .btn-red   { background: rgba(248,81,73,0.15); color: var(--red);   border: 1px solid rgba(248,81,73,0.3); }
+        .btn-edit  { background: rgba(47,129,247,0.15); color: var(--accent); border: 1px solid rgba(47,129,247,0.3); }
+
+        /* ── Table ── */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        thead th {
+            padding: 0.75rem 1.5rem;
+            text-align: left; font-size: 0.75rem;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--muted); border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        tbody td { padding: 0.75rem 1.5rem; font-size: 0.875rem; border-bottom: 1px solid rgba(48,54,61,0.5); }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: rgba(255,255,255,0.02); }
+        .actions { display: flex; gap: 0.5rem; }
+
+        /* ── Alert ── */
+        #alert { display: none; position: fixed; top: 70px; right: 1.5rem;
+                 padding: 0.75rem 1.25rem; border-radius: 8px; font-size: 0.875rem;
+                 z-index: 999; animation: slide-in 0.2s ease; }
+        .alert-success { background: #0f2a1a; color: var(--green); border: 1px solid #1a4a2a; }
+        .alert-error   { background: #2a0f0f; color: var(--red);   border: 1px solid #4a1a1a; }
+        @keyframes slide-in { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform: translateX(0); } }
+
+        .empty { padding: 3rem; text-align: center; color: var(--muted); font-size: 0.9rem; }
+        .chip {
+            display: inline-block; padding: 2px 8px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 600;
+        }
+        .chip-blue { background: rgba(47,129,247,0.15); color: var(--accent); }
+        .chip-purple { background: rgba(124,58,237,0.15); color: #a78bfa; }
+
+        /* ── Architecture ── */
+        .arch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; padding: 1.5rem; }
+        .arch-box {
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 10px; padding: 1.2rem; text-align: center;
+        }
+        .arch-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .arch-title { font-weight: 600; font-size: 0.9rem; }
+        .arch-sub { color: var(--muted); font-size: 0.75rem; margin-top: 4px; }
+        .arch-port { color: var(--green); font-size: 0.72rem; margin-top: 4px; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">D</div>
+    <h1>Demo Microservice App</h1>
+    <div class="header-right">
+        <span class="badge-green">● Services Running</span>
+    </div>
+</header>
+
+<nav>
+    <button class="nav-btn active" onclick="showTab('overview', this)">Overview</button>
+    <button class="nav-btn" onclick="showTab('products', this)">Products</button>
+    <button class="nav-btn" onclick="showTab('users', this)">Users</button>
+</nav>
+
+<div id="alert"></div>
+
+<main>
+
+    <!-- ── Overview ── -->
+    <div id="tab-overview" class="tab active">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-num" style="color: var(--accent)" id="stat-products">–</div>
+                <div class="stat-label">Total Products</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" style="color: var(--accent2)" id="stat-users">–</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" style="color: var(--green)">3</div>
+                <div class="stat-label">Containers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" style="color: var(--yellow)">K8s</div>
+                <div class="stat-label">Orchestration</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Architecture</div>
+            <div class="arch-grid">
+                <div class="arch-box">
+                    <div class="arch-icon">🌐</div>
+                    <div class="arch-title">Frontend</div>
+                    <div class="arch-sub">Nginx · HTML/CSS/JS</div>
+                    <div class="arch-port">:80</div>
+                </div>
+                <div class="arch-box">
+                    <div class="arch-icon">☕</div>
+                    <div class="arch-title">Backend API</div>
+                    <div class="arch-sub">Spring Boot 3.2 · Java 17</div>
+                    <div class="arch-port">:8080</div>
+                </div>
+                <div class="arch-box">
+                    <div class="arch-icon">🐘</div>
+                    <div class="arch-title">Database</div>
+                    <div class="arch-sub">PostgreSQL 15</div>
+                    <div class="arch-port">:5432</div>
+                </div>
+                <div class="arch-box">
+                    <div class="arch-icon">🔁</div>
+                    <div class="arch-title">CI/CD</div>
+                    <div class="arch-sub">Jenkins Pipeline</div>
+                    <div class="arch-port">Jenkinsfile</div>
+                </div>
+                <div class="arch-box">
+                    <div class="arch-icon">☸️</div>
+                    <div class="arch-title">Kubernetes</div>
+                    <div class="arch-sub">Deployments · Services · HPA</div>
+                    <div class="arch-port">k8s/</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Products ── -->
+    <div id="tab-products" class="tab">
+        <div class="card">
+            <div class="card-header">Add Product</div>
+            <div class="form-body">
+                <div class="form-grid">
+                    <div class="field"><label>Name *</label><input id="p-name" placeholder="Product name" /></div>
+                    <div class="field"><label>Price *</label><input id="p-price" type="number" step="0.01" placeholder="0.00" /></div>
+                    <div class="field"><label>Quantity</label><input id="p-qty" type="number" placeholder="0" /></div>
+                    <div class="field"><label>Category</label><input id="p-cat" placeholder="e.g. Electronics" /></div>
+                    <div class="field"><label>Description</label><input id="p-desc" placeholder="Short description" /></div>
+                </div>
+                <button class="btn btn-primary" onclick="createProduct()">Add Product</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span>All Products</span>
+                <input id="p-search" placeholder="Search..." style="width:180px;padding:4px 8px;font-size:0.8rem"
+                       oninput="searchProducts(this.value)" />
+            </div>
+            <div class="table-wrap">
+                <div id="products-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Users ── -->
+    <div id="tab-users" class="tab">
+        <div class="card">
+            <div class="card-header">Add User</div>
+            <div class="form-body">
+                <div class="form-grid">
+                    <div class="field"><label>Name *</label><input id="u-name" placeholder="Full name" /></div>
+                    <div class="field"><label>Email *</label><input id="u-email" type="email" placeholder="email@example.com" /></div>
+                    <div class="field"><label>Role</label>
+                        <select id="u-role">
+                            <option value="USER">User</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                    </div>
+                    <div class="field"><label>Phone</label><input id="u-phone" placeholder="+91-..." /></div>
+                </div>
+                <button class="btn btn-primary" onclick="createUser()">Add User</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">All Users</div>
+            <div class="table-wrap">
+                <div id="users-body"></div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<script>
+    const API = '/api';
+
+    // ── Tab switching ──
+    function showTab(name, btn) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        btn.classList.add('active');
+        if (name === 'products') loadProducts();
+        if (name === 'users')    loadUsers();
+        if (name === 'overview') loadStats();
+    }
+
+    // ── Alert ──
+    function alert(msg, type = 'success') {
+        const el = document.getElementById('alert');
+        el.textContent = msg;
+        el.className = type === 'success' ? 'alert-success' : 'alert-error';
+        el.style.display = 'block';
+        setTimeout(() => { el.style.display = 'none'; }, 3000);
+    }
+
+    // ── Stats ──
+    async function loadStats() {
+        try {
+            const [p, u] = await Promise.all([
+                fetch(API + '/products').then(r => r.json()),
+                fetch(API + '/users').then(r => r.json())
+            ]);
+            document.getElementById('stat-products').textContent = Array.isArray(p) ? p.length : '?';
+            document.getElementById('stat-users').textContent    = Array.isArray(u) ? u.length : '?';
+        } catch(e) { console.error(e); }
+    }
+
+    // ── Products ──
+    async function loadProducts(search) {
+        const url = search ? `${API}/products?search=${encodeURIComponent(search)}` : `${API}/products`;
+        const data = await fetch(url).then(r => r.json());
+        renderProducts(data);
+    }
+
+    function searchProducts(q) { loadProducts(q); }
+
+    function renderProducts(list) {
+        const el = document.getElementById('products-body');
+        if (!list.length) { el.innerHTML = '<div class="empty">No products found.</div>'; return; }
+        el.innerHTML = `<table>
+            <thead><tr>
+                <th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Qty</th><th>Actions</th>
+            </tr></thead>
+            <tbody>${list.map(p => `<tr>
+                <td>${p.id}</td>
+                <td>${p.name}</td>
+                <td><span class="chip chip-blue">${p.category || '–'}</span></td>
+                <td>₹${p.price}</td>
+                <td>${p.quantity}</td>
+                <td class="actions">
+                    <button class="btn btn-sm btn-red" onclick="deleteProduct(${p.id})">Delete</button>
+                </td>
+            </tr>`).join('')}</tbody>
+        </table>`;
+    }
+
+    async function createProduct() {
+        const body = {
+            name:        document.getElementById('p-name').value.trim(),
+            price:       parseFloat(document.getElementById('p-price').value),
+            quantity:    parseInt(document.getElementById('p-qty').value) || 0,
+            category:    document.getElementById('p-cat').value.trim(),
+            description: document.getElementById('p-desc').value.trim()
+        };
+        if (!body.name || !body.price) { alert('Name and price are required', 'error'); return; }
+        const res = await fetch(API + '/products', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        });
+        if (res.ok) { alert('Product created!'); loadProducts(); }
+        else { const e = await res.json(); alert(JSON.stringify(e), 'error'); }
+    }
+
+    async function deleteProduct(id) {
+        if (!confirm('Delete product #' + id + '?')) return;
+        await fetch(API + '/products/' + id, { method: 'DELETE' });
+        alert('Product deleted');
+        loadProducts();
+    }
+
+    // ── Users ──
+    async function loadUsers() {
+        const list = await fetch(API + '/users').then(r => r.json());
+        const el = document.getElementById('users-body');
+        if (!list.length) { el.innerHTML = '<div class="empty">No users found.</div>'; return; }
+        el.innerHTML = `<table>
+            <thead><tr>
+                <th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Phone</th><th>Actions</th>
+            </tr></thead>
+            <tbody>${list.map(u => `<tr>
+                <td>${u.id}</td>
+                <td>${u.name}</td>
+                <td>${u.email}</td>
+                <td><span class="chip ${u.role === 'ADMIN' ? 'chip-purple' : 'chip-blue'}">${u.role}</span></td>
+                <td>${u.phone || '–'}</td>
+                <td class="actions">
+                    <button class="btn btn-sm btn-red" onclick="deleteUser(${u.id})">Delete</button>
+                </td>
+            </tr>`).join('')}</tbody>
+        </table>`;
+    }
+
+    async function createUser() {
+        const body = {
+            name:  document.getElementById('u-name').value.trim(),
+            email: document.getElementById('u-email').value.trim(),
+            role:  document.getElementById('u-role').value,
+            phone: document.getElementById('u-phone').value.trim()
+        };
+        if (!body.name || !body.email) { alert('Name and email are required', 'error'); return; }
+        const res = await fetch(API + '/users', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        });
+        if (res.ok) { alert('User created!'); loadUsers(); }
+        else { const e = await res.json(); alert(JSON.stringify(e), 'error'); }
+    }
+
+    async function deleteUser(id) {
+        if (!confirm('Delete user #' + id + '?')) return;
+        await fetch(API + '/users/' + id, { method: 'DELETE' });
+        alert('User deleted');
+        loadUsers();
+    }
+
+    loadStats();
+</script>
+</body>
+</html>

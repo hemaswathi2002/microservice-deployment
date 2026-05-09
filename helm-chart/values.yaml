@@ -1,0 +1,50 @@
+namespace: demo-app
+imagePullPolicy: Always
+backend:
+  name: backend
+  image: hemaswathi2002/micro-backend
+  tag: v1
+  replicaCount: 2
+  servicePort: 8080
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 250m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+frontend:
+  name: frontend
+  image: hemaswathi2002/micro-frontend
+  tag: v1
+  replicaCount: 2
+  servicePort: 80
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 50m
+    limits:
+      memory: 128Mi
+      cpu: 100m
+postgres:
+  image: postgres:15-alpine
+  storage: 1Gi
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 250m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+dbSecret:
+  DB_USER: demouser
+  DB_PASS: demopass
+  DB_NAME: demodb
+config:
+  DB_HOST: postgres
+  DB_PORT: "5432"
+  SPRING_PROFILES_ACTIVE: docker
+ingress:
+  enabled: true
+  host: demo.local
+  ingressClassName: nginx
