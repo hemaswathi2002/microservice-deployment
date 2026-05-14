@@ -1,0 +1,11 @@
+com\demo\Application.class
+com\demo\controller\UserController.class
+com\demo\controller\GlobalExceptionHandler.class
+com\demo\model\Product.class
+com\demo\model\User.class
+com\demo\service\ProductService.class
+com\demo\controller\ProductController.class
+com\demo\service\UserService.class
+com\demo\repository\UserRepository.class
+com\demo\DataLoader.class
+com\demo\repository\ProductRepository.class
